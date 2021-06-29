@@ -1,29 +1,29 @@
-canalización {
-    agente {
+pipeline {
+    agent {
         docker {
-            imagen ' maven: 3-alpine '
-            args ' -v /root/.m2:/root/.m2 '
+            image 'maven:3-alpine'
+            args '-v /root/.m2:/root/.m2'
         }
     }
-    etapas {
-        stage ( ' Build ' ) {
-            pasos {
-                sh ' mvn -B -DskipTests paquete limpio '
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn -B -DskipTests clean package'
             }
         }
-        stage ( ' Prueba ' ) {
-            pasos {
-                sh ' prueba mvn '
+        stage('Test') {
+            steps {
+                sh 'mvn test'
             }
-            correo {
-                siempre {
-                    junit ' objetivo / surefire-reports / *. xml '
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-        stage ( ' Entrega ' ) {
-            pasos {
-                sh ' ./jenkins/scripts/deliver.sh '
+        stage('Deliver') {
+            steps {
+                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
